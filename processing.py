@@ -9,7 +9,7 @@ def main():
 	fd = FreqDist(word_tokenize(tweetCorpus))
 	fd2 = FreqDist(tweetCorpus.split(' '))
 	print(fd.most_common(100))
-	print(fd2pp.most_common(100))
+	print(fd2.most_common(100))
 
 
 
