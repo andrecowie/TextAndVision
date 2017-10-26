@@ -34,7 +34,7 @@ def main():
 	fd = FreqDist(word_tokenize(allNes))
 	print(fd.most_common(100))
 	for coin, mentions in coincounta.items():
-		print(coin+" was mentioned: "+str(mentions[0])+" times of which "+str(sum(mentions[1]))+" where mentioned positively")
+		print(coin+" was mentioned: "+str(mentions[0])+" times, "+str(sum(mentions[1]))+" times positively")
 
 
 def split_into_tokens(message):
