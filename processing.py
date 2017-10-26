@@ -2,21 +2,45 @@ import json
 from nltk.tokenize import word_tokenize
 from nltk.probability import FreqDist
 from textblob import TextBlob
+import pickle
+
 
 def main():
+	model = pickle.load(open('tonDreSent.pkl', 'rb'))
+	with open('namedcoins.json') as f:
+		coins = json.loads(f.read())
 	with open('newdata.json') as f:
-		x = f.read()
-	data = json.loads(x)
+		data = json.loads(f.read())
 	allNes = " "
+	coincounta = {}
 	for x in data:
-		a = tokneiza(x[1]['attributes']['tweet']['S'])
-		allNes += " ".join(list(a[2]))
+		tweet = x[1]['attributes']['tweet']['S']
+		oursentiment = model.predict([tweet])
+		a = tokneiza(tweet)
+		words = list(a[0])
+		for word in words:
+			for coin, coinphrase in coins.items():
+				if word in coinphrase:
+					if coin in list(coincounta.keys()):
+						coincounta[coin][0] += 1
+						coincounta[coin][1].append(oursentiment[0])
+					else:
+						coincounta[coin]= [1, [oursentiment[0]]]
+		nouns = list(a[2])
+		allNes += " ".join(nouns)
 	allNes.maketrans(" ","$")
 	allNes.maketrans(" ","#")
 	allNes.maketrans(" ", "@")
 	fd = FreqDist(word_tokenize(allNes))
 	print(fd.most_common(100))
+	for coin, mentions in coincounta.items():
+		print(coin+" was mentioned: "+str(mentions[0])+" times of which "+str(sum(mentions[1]))+" where mentioned positively")
 
+
+def split_into_tokens(message):
+    if type(message) is float:
+        message = str(message)
+    return TextBlob(message).words#  / .tags
 
 def tokneiza(message):
 	if type(message) is not str:
